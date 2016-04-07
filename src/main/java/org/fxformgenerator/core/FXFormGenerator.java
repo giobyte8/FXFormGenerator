@@ -5,7 +5,7 @@ package org.fxformgenerator.core;
  */
 public class FXFormGenerator {
 
-    public static FormBuilder forModel(Object model) {
-        return new FormBuilder(model);
+    public static FFGBuilder forModel(Object model) {
+        return new FFGBuilder(model);
     }
 }

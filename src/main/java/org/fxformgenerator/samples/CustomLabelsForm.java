@@ -6,9 +6,9 @@ import org.fxformgenerator.core.FXFormGenerator;
 import org.fxformgenerator.samples.models.User;
 
 /**
- * Created by giovanni on 4/6/16.
+ * Created by giovanni on 4/7/16.
  */
-public class SimpleForm extends Application {
+public class CustomLabelsForm extends Application {
 
     public static void main(String[] args) {
         launch(args);
@@ -21,6 +21,8 @@ public class SimpleForm extends Application {
         User user = new User();
         FXFormGenerator
                 .forModel(user)
+                .assignFieldLabel("fullName", "Nombre completo")
+                .assignFieldLabel("username", "Nombre de usuario")
                 .showAsDialog(
                         "New user",
                         "Create new user account"
