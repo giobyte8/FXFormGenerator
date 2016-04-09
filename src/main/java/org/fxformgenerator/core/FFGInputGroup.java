@@ -2,9 +2,7 @@ package org.fxformgenerator.core;
 
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
 import java.beans.PropertyDescriptor;
@@ -22,6 +20,8 @@ public class FFGInputGroup {
     private Object model;
     private String editorLB;
     private PropertyDescriptor propDesc;
+
+    private double minMaxEditorWidth = 220.0;
 
 
     /**
@@ -99,6 +99,7 @@ public class FFGInputGroup {
             });
 
             fieldTF.setText(getCurrentValue().toString());
+            fieldTF.setMinWidth(minMaxEditorWidth);
             return fieldTF;
         }
         else if (getterMethod.getReturnType() == boolean.class) {
@@ -108,7 +109,62 @@ public class FFGInputGroup {
             });
 
             fieldCB.setSelected((boolean) getCurrentValue());
+            fieldCB.setMinWidth(minMaxEditorWidth);
             return fieldCB;
+        }
+        else if (getterMethod.getReturnType() == int.class) {
+            Spinner fieldSP = new Spinner(new SpinnerValueFactory.IntegerSpinnerValueFactory(
+                    Integer.MIN_VALUE,
+                    Integer.MAX_VALUE,
+                    (int) getCurrentValue()
+            ));
+
+            // TODO Implement pure integer editable field
+            // fieldSP.getEditor().setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 0));
+            // fieldSP.setEditable(true);
+
+            fieldSP.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+                this.updateFieldValue(Integer.parseInt(newValue));
+            });
+
+            fieldSP.setMinWidth(minMaxEditorWidth);
+            return fieldSP;
+        }
+        else if (getterMethod.getReturnType() == float.class) {
+            Spinner fieldSP = new Spinner(new SpinnerValueFactory.DoubleSpinnerValueFactory(
+                    Float.MIN_VALUE,
+                    Float.MAX_VALUE,
+                    (float) getCurrentValue()
+            ));
+
+            // TODO Implement pure float editable field
+            // fieldSP.getEditor().setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 0));
+            // fieldSP.setEditable(true);
+
+            fieldSP.getEditor().textProperty().addListener((obs, oldV, newV) -> {
+                this.updateFieldValue(Float.parseFloat(newV));
+            });
+
+            fieldSP.setMinWidth(minMaxEditorWidth);
+            return fieldSP;
+        }
+        else if (getterMethod.getReturnType() == double.class) {
+            Spinner fieldSP = new Spinner(new SpinnerValueFactory.DoubleSpinnerValueFactory(
+                    Double.MIN_VALUE,
+                    Double.MAX_VALUE,
+                    (double) getCurrentValue()
+            ));
+
+            // TODO Implement pure double editable field
+            // fieldSP.getEditor().setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 0));
+            // fieldSP.setEditable(true);
+
+            fieldSP.getEditor().textProperty().addListener((obs, oldV, newV) -> {
+                this.updateFieldValue(Double.parseDouble(newV));
+            });
+
+            fieldSP.setMinWidth(minMaxEditorWidth);
+            return fieldSP;
         }
 
         return null;

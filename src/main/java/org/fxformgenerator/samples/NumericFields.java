@@ -4,11 +4,12 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import org.fxformgenerator.core.FXFormGenerator;
 import org.fxformgenerator.samples.models.Address;
+import org.fxformgenerator.samples.models.Product;
 
 /**
- * Created by giovanni on 4/8/16.
+ * Created by giovanni on 4/9/16.
  */
-public class ExcludedFields extends Application {
+public class NumericFields extends Application {
 
     public static void main(String[] args) {
         launch(args);
@@ -18,13 +19,14 @@ public class ExcludedFields extends Application {
     public void start(Stage primaryStage) throws Exception {
         primaryStage.show();
 
-        Address address = new Address();
+        Product product = new Product();
         FXFormGenerator
-                .forModel(address)
-                .excludeFields("id")
+                .forModel(product)
+                .assignFieldLabel("uniqueCode", "SKU")
+                .assignFieldsOrder("uniqueCode", "productName", "unitPrice")
                 .showAsDialog(
-                        "New user",
-                        "Create new user account"
+                        "New product",
+                        "Create new product"
                 );
     }
 }

@@ -7,10 +7,8 @@ import javafx.scene.layout.VBox;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by giovanni on 4/5/16.
@@ -23,6 +21,13 @@ public class FFGBuilder {
     /** Custom labels to use in form fields */
     private Map<String, String> fieldLabels = new HashMap<>();
 
+    /**
+     * Contains each form's fields in corresponding order to be
+     * displayed in form.
+     */
+    private List<String> orderedFields = new ArrayList<>();
+
+    /** Name of fields that will be ignored on form creation */
     private List<String> excludedFields = new ArrayList<>();
 
 
@@ -93,6 +98,22 @@ public class FFGBuilder {
         return this;
     }
 
+    /**
+     * Sets the order to display fields into form.
+     * NOTE: Fields not included in param <code>orderedFields</code> will be
+     * added after ordered fields.
+     *
+     * @param orderedFields A list with field's names in corresponding sequence
+     *                      to be displayed in form.
+     * @return
+     */
+    public FFGBuilder assignFieldsOrder(String... orderedFields) {
+        this.orderedFields.clear();
+        this.orderedFields.addAll(Arrays.asList(orderedFields));
+
+        return this;
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////
     // Builder methods
@@ -101,39 +122,18 @@ public class FFGBuilder {
         VBox formContainer = new VBox(3);
         List<FFGInputGroup> inputGroups = new ArrayList<>();
 
-        try {
-            PropertyDescriptor[] propDescriptors = Introspector
-                    .getBeanInfo(model.getClass(), Object.class)
-                    .getPropertyDescriptors();
-
-            for (PropertyDescriptor pDesc : propDescriptors) {
-
-                // Check if is not excluded
-                if (!excludedFields.contains(pDesc.getName())) {
-
-                    // Getter and setter methods accesibles
-                    if (pDesc.getReadMethod() != null && pDesc.getWriteMethod() != null) {
-
-                        if (fieldLabels.containsKey(pDesc.getName())) {
-                            inputGroups.add(new FFGInputGroup(
-                                    model,
-                                    fieldLabels.get(pDesc.getName()),
-                                    pDesc
-                            ));
-                        }
-                        else {
-                            inputGroups.add(new FFGInputGroup(model, pDesc));
-                        }
-                    }
-                    else {
-                        System.err.println("Setter and getter methods not found");
-                    }
-                }
+        // Recover all properties to be added to form
+        for (PropertyDescriptor pDesc : getFormProperties()) {
+            if (fieldLabels.containsKey(pDesc.getName())) {
+                inputGroups.add(new FFGInputGroup(
+                        model,
+                        fieldLabels.get(pDesc.getName()),
+                        pDesc
+                ));
             }
-        }
-        catch (IntrospectionException e) {
-            System.err.println("Introspection error");
-            System.err.println(e.getMessage());
+            else {
+                inputGroups.add(new FFGInputGroup(model, pDesc));
+            }
         }
 
         // Assembly all form nodes into a single VBox parent
@@ -142,6 +142,58 @@ public class FFGBuilder {
         }
 
         return formContainer;
+    }
+
+    /**
+     * Iterates over each property inside model object and check that:     <br/>
+     * - Property is not included in excluded fields                       <br/>
+     * - Property's accessors and setters methods are available.           <br/>
+     * - ...                                                               <br/>
+     *
+     * @return Properties to be included into form in corresponding order.
+     */
+    private List<PropertyDescriptor> getFormProperties() {
+        List<PropertyDescriptor> orderedFormProperties = new ArrayList<>();
+        List<PropertyDescriptor> formProperties = new ArrayList<>();
+
+        try {
+            PropertyDescriptor[] propDescriptors = Introspector
+                    .getBeanInfo(model.getClass(), Object.class)
+                    .getPropertyDescriptors();
+
+            for (PropertyDescriptor pDesc : propDescriptors) {
+                if (!excludedFields.contains(pDesc.getName())) {
+                    if (pDesc.getReadMethod() != null && pDesc.getWriteMethod() != null) {
+                        formProperties.add(pDesc);
+                    }
+                    else {
+                        System.err.println("Setter and getter methods not available");
+                    }
+                }
+            }
+
+            // Put form properties in corresponding order
+            for (String fieldName : orderedFields) {
+                orderedFormProperties.addAll(
+                        formProperties
+                                .stream()
+                                .filter(pDesc -> fieldName.equals(pDesc.getName()))
+                                .collect(Collectors.toList())
+                );
+            }
+
+            // Add not ordered properties after ordered properties
+            formProperties
+                    .stream()
+                    .filter(pDesc -> !orderedFormProperties.contains(pDesc))
+                    .forEach(orderedFormProperties::add);
+        }
+        catch (IntrospectionException e) {
+            System.err.println("Introspection error");
+            System.err.println(e.getMessage());
+        }
+
+        return orderedFormProperties;
     }
 
     /**
