@@ -9,6 +9,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 /**
@@ -172,7 +173,9 @@ public class FFGInputGroup {
             DatePicker fieldDP = new DatePicker();
             fieldDP.getEditor().setEditable(false);
 
-            //fieldDP.setValue((LocalDate) getCurrentValue());
+            LocalDate date = ((Date) getCurrentValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            fieldDP.setValue(date);
+
             fieldDP.setMinWidth(minMaxEditorWidth);
             fieldDP.setMaxWidth(minMaxEditorWidth);
             return fieldDP;
