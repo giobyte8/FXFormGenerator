@@ -23,6 +23,8 @@ public class FFGBuilder {
     /** Custom labels to use in form fields */
     private Map<String, String> fieldLabels = new HashMap<>();
 
+    private List<String> excludedFields = new ArrayList<>();
+
 
     public FFGBuilder(Object model) {
         this.model = model;
@@ -59,6 +61,38 @@ public class FFGBuilder {
         return this;
     }
 
+    /**
+     * Excludes a field from form.
+     * FXFormGenerator will not generate form input for this field
+     *
+     * @param field Field's name to be excluded from generated form
+     * @return
+     */
+    public FFGBuilder excludeField(String field) {
+        if (!this.excludedFields.contains(field)) {
+            this.excludedFields.add(field);
+        }
+
+        return this;
+    }
+
+    /**
+     * Excludes a bunch of fields from form
+     * FXFormGenerator will not generate form inputs for those fields.
+     *
+     * @param fields Field's names to be excluded from generated form
+     * @return
+     */
+    public FFGBuilder excludeFields(String... fields) {
+        for (String field : fields) {
+            if (!this.excludedFields.contains(field)) {
+                this.excludedFields.add(field);
+            }
+        }
+
+        return this;
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////
     // Builder methods
@@ -73,17 +107,26 @@ public class FFGBuilder {
                     .getPropertyDescriptors();
 
             for (PropertyDescriptor pDesc : propDescriptors) {
-                if (pDesc.getReadMethod() != null && pDesc.getWriteMethod() != null) {
 
-                    if (fieldLabels.containsKey(pDesc.getName())) {
-                        inputGroups.add(new FFGInputGroup(
-                                model,
-                                fieldLabels.get(pDesc.getName()),
-                                pDesc
-                        ));
+                // Check if is not excluded
+                if (!excludedFields.contains(pDesc.getName())) {
+
+                    // Getter and setter methods accesibles
+                    if (pDesc.getReadMethod() != null && pDesc.getWriteMethod() != null) {
+
+                        if (fieldLabels.containsKey(pDesc.getName())) {
+                            inputGroups.add(new FFGInputGroup(
+                                    model,
+                                    fieldLabels.get(pDesc.getName()),
+                                    pDesc
+                            ));
+                        }
+                        else {
+                            inputGroups.add(new FFGInputGroup(model, pDesc));
+                        }
                     }
                     else {
-                        inputGroups.add(new FFGInputGroup(model, pDesc));
+                        System.err.println("Setter and getter methods not found");
                     }
                 }
             }

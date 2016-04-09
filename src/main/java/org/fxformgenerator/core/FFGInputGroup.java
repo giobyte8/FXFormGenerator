@@ -2,6 +2,7 @@ package org.fxformgenerator.core;
 
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -93,12 +94,21 @@ public class FFGInputGroup {
 
         if (getterMethod.getReturnType() == String.class) {
             TextField fieldTF = new TextField();
-            fieldTF.textProperty().addListener((observable, oldValue, newValue) -> {
-                this.updateFieldValue(newValue);
+            fieldTF.textProperty().addListener((obs, oldV, newV) -> {
+                this.updateFieldValue(newV);
             });
 
             fieldTF.setText(getCurrentValue().toString());
             return fieldTF;
+        }
+        else if (getterMethod.getReturnType() == boolean.class) {
+            CheckBox fieldCB = new CheckBox();
+            fieldCB.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                this.updateFieldValue(newValue);
+            });
+
+            fieldCB.setSelected((boolean) getCurrentValue());
+            return fieldCB;
         }
 
         return null;
@@ -110,7 +120,7 @@ public class FFGInputGroup {
      *
      * @param newValue value to pass to setter method as parameter
      */
-    private void updateFieldValue(String newValue) {
+    private void updateFieldValue(Object newValue) {
         try {
             propDesc.getWriteMethod().invoke(model, newValue);
         }
