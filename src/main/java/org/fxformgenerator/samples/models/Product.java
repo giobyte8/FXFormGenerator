@@ -2,6 +2,8 @@ package org.fxformgenerator.samples.models;
 
 import javafx.beans.property.*;
 
+import java.util.Date;
+
 /**
  * Created by giovanni on 4/9/16.
  */
@@ -11,6 +13,8 @@ public class Product {
     private StringProperty productName = new SimpleStringProperty();
     private DoubleProperty unitPrice = new SimpleDoubleProperty();
     private FloatProperty taxPercent = new SimpleFloatProperty();
+
+    private Date expirationDate = new Date();
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -61,5 +65,13 @@ public class Product {
 
     public void setTaxPercent(float taxPercent) {
         this.taxPercent.set(taxPercent);
+    }
+
+    public Date getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(Date expirationDate) {
+        this.expirationDate = expirationDate;
     }
 }

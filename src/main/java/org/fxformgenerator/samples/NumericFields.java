@@ -3,7 +3,6 @@ package org.fxformgenerator.samples;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.fxformgenerator.core.FXFormGenerator;
-import org.fxformgenerator.samples.models.Address;
 import org.fxformgenerator.samples.models.Product;
 
 /**

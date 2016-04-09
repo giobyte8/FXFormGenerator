@@ -8,6 +8,8 @@ import javafx.scene.layout.VBox;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.LocalDate;
+import java.util.Date;
 
 /**
  * A Form input group represents an element that contains
@@ -165,6 +167,15 @@ public class FFGInputGroup {
 
             fieldSP.setMinWidth(minMaxEditorWidth);
             return fieldSP;
+        }
+        else if (getterMethod.getReturnType() == Date.class) {
+            DatePicker fieldDP = new DatePicker();
+            fieldDP.getEditor().setEditable(false);
+
+            //fieldDP.setValue((LocalDate) getCurrentValue());
+            fieldDP.setMinWidth(minMaxEditorWidth);
+            fieldDP.setMaxWidth(minMaxEditorWidth);
+            return fieldDP;
         }
 
         return null;
