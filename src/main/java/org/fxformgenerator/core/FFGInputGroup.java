@@ -86,7 +86,7 @@ public class FFGInputGroup {
     }
 
     /**
-     * Constructs a binded editor based on #propDesc type
+     * Constructs a linked editor based on #propDesc type
      * TextField for types: [String | ]
      * CheckBox for types: [boolean ]
      *

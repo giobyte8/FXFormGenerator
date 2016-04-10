@@ -2,6 +2,7 @@ package org.fxformgenerator.core;
 
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.beans.IntrospectionException;
@@ -29,6 +30,8 @@ public class FFGBuilder {
 
     /** Name of fields that will be ignored on form creation */
     private List<String> excludedFields = new ArrayList<>();
+
+    private int formLayout = FFGLayout.MULTIPLE_COLUMNS;
 
 
     public FFGBuilder(Object model) {
@@ -137,8 +140,32 @@ public class FFGBuilder {
         }
 
         // Assembly all form nodes into a single VBox parent
-        for (FFGInputGroup inputGroup : inputGroups) {
-            formContainer.getChildren().add(inputGroup.buildAsVBox());
+        switch (this.formLayout) {
+            case FFGLayout.MULTIPLE_COLUMNS:
+                if (inputGroups.size() <= 6) {
+                    for (int i = 0; i < inputGroups.size(); i+=2) {
+                        VBox ig1 = inputGroups.get(i).buildAsVBox();
+                        VBox ig2 = null;
+
+                        if (i+1 < inputGroups.size()) {
+                            ig2 = inputGroups.get(i+1).buildAsVBox();
+                        }
+
+                        HBox hBox = new HBox(10);
+                        hBox.getChildren().add(ig1);
+                        if (ig2 != null) {
+                            hBox.getChildren().add(ig2);
+                        }
+
+                        formContainer.getChildren().add(hBox);
+                    }
+                }
+                break;
+            default:
+                for (FFGInputGroup inputGroup : inputGroups) {
+                    formContainer.getChildren().add(inputGroup.buildAsVBox());
+                }
+                break;
         }
 
         return formContainer;
