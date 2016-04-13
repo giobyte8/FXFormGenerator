@@ -17,6 +17,9 @@ Automatic form generator for javafx 8
  * Support to assign an arbitrary ChoiceBox for given form editor inputs
  * Support to assign custom input nodes as editor for given inputs
  * Integration with Java Validation API
+ * Support to custom text into Accept and cancel buttons on show as dialog calls
+ * Support to custom fields rows spacing and input groups spacing
+ * Support to custom form main container padding/margin
  * Support for custom CSS
  * (?) Multiple predefined CSS Themes
  
