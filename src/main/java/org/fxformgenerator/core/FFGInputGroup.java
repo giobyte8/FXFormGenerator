@@ -103,6 +103,7 @@ public class FFGInputGroup {
 
             fieldTF.setText(getCurrentValue().toString());
             fieldTF.setMinWidth(minMaxEditorWidth);
+            fieldTF.setMaxWidth(minMaxEditorWidth);
             return fieldTF;
         }
         else if (getterMethod.getReturnType() == boolean.class) {
@@ -113,6 +114,7 @@ public class FFGInputGroup {
 
             fieldCB.setSelected((boolean) getCurrentValue());
             fieldCB.setMinWidth(minMaxEditorWidth);
+            fieldCB.setMaxWidth(minMaxEditorWidth);
             return fieldCB;
         }
         else if (getterMethod.getReturnType() == int.class) {
@@ -131,6 +133,7 @@ public class FFGInputGroup {
             });
 
             fieldSP.setMinWidth(minMaxEditorWidth);
+            fieldSP.setMaxWidth(minMaxEditorWidth);
             return fieldSP;
         }
         else if (getterMethod.getReturnType() == float.class) {
@@ -149,6 +152,7 @@ public class FFGInputGroup {
             });
 
             fieldSP.setMinWidth(minMaxEditorWidth);
+            fieldSP.setMaxWidth(minMaxEditorWidth);
             return fieldSP;
         }
         else if (getterMethod.getReturnType() == double.class) {
@@ -167,6 +171,7 @@ public class FFGInputGroup {
             });
 
             fieldSP.setMinWidth(minMaxEditorWidth);
+            fieldSP.setMaxWidth(minMaxEditorWidth);
             return fieldSP;
         }
         else if (getterMethod.getReturnType() == Date.class) {
@@ -215,5 +220,13 @@ public class FFGInputGroup {
             System.err.println("Can not invoke getter method");
             return "";
         }
+    }
+
+    public double getMinMaxEditorWidth() {
+        return minMaxEditorWidth;
+    }
+
+    public void setMinMaxEditorWidth(double minMaxEditorWidth) {
+        this.minMaxEditorWidth = minMaxEditorWidth;
     }
 }

@@ -15,6 +15,9 @@ public class Product {
     private FloatProperty taxPercent = new SimpleFloatProperty();
 
     private Date expirationDate = new Date();
+    private StringProperty provider = new SimpleStringProperty();
+    private BooleanProperty adultsOnly = new SimpleBooleanProperty();
+    private StringProperty originCountry = new SimpleStringProperty();
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -73,5 +76,41 @@ public class Product {
 
     public void setExpirationDate(Date expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public String getProvider() {
+        return provider.get();
+    }
+
+    public StringProperty providerProperty() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider.set(provider);
+    }
+
+    public boolean getAdultsOnly() {
+        return adultsOnly.get();
+    }
+
+    public BooleanProperty adultsOnlyProperty() {
+        return adultsOnly;
+    }
+
+    public void setAdultsOnly(boolean adultsOnly) {
+        this.adultsOnly.set(adultsOnly);
+    }
+
+    public String getOriginCountry() {
+        return originCountry.get();
+    }
+
+    public StringProperty originCountryProperty() {
+        return originCountry;
+    }
+
+    public void setOriginCountry(String originCountry) {
+        this.originCountry.set(originCountry);
     }
 }

@@ -117,6 +117,11 @@ public class FFGBuilder {
         return this;
     }
 
+    public FFGBuilder assignFormLayout(int formLayout) {
+        this.formLayout = formLayout;
+        return this;
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////
     // Builder methods
@@ -142,33 +147,92 @@ public class FFGBuilder {
         // Assembly all form nodes into a single VBox parent
         switch (this.formLayout) {
             case FFGLayout.MULTIPLE_COLUMNS:
-                if (inputGroups.size() <= 6) {
-                    for (int i = 0; i < inputGroups.size(); i+=2) {
-                        VBox ig1 = inputGroups.get(i).buildAsVBox();
-                        VBox ig2 = null;
+                return this.assemblyMultipleColumns(inputGroups);
 
-                        if (i+1 < inputGroups.size()) {
-                            ig2 = inputGroups.get(i+1).buildAsVBox();
-                        }
+            case FFGLayout.MULTIPLE_FULLWIDTHROWS_COLUMNS:
+                return this.assemblyMultipleColumnsRowsFilled(inputGroups);
 
-                        HBox hBox = new HBox(10);
-                        hBox.getChildren().add(ig1);
-                        if (ig2 != null) {
-                            hBox.getChildren().add(ig2);
-                        }
-
-                        formContainer.getChildren().add(hBox);
-                    }
-                }
-                break;
+            case FFGLayout.SINGLE_COLUMN:
             default:
-                for (FFGInputGroup inputGroup : inputGroups) {
-                    formContainer.getChildren().add(inputGroup.buildAsVBox());
-                }
-                break;
+                return this.assemblySingleColumn(inputGroups);
+        }
+    }
+
+    private VBox assemblyMultipleColumns(List<FFGInputGroup> inputGroups) {
+        VBox formContainer = new VBox(3);
+        int numColumns = this.determineColumnsNumber(inputGroups);
+
+        for (int i = 0; i < inputGroups.size(); i+=numColumns) {
+
+            HBox formRow;
+            if (i + (numColumns - 1) < inputGroups.size()) {
+                formRow = this.putInRow(inputGroups.subList(i, i + numColumns));
+            }
+            else {
+                formRow = this.putInRow(inputGroups.subList(i, inputGroups.size()));
+            }
+
+            formContainer.getChildren().add(formRow);
         }
 
         return formContainer;
+    }
+
+    private VBox assemblyMultipleColumnsRowsFilled(List<FFGInputGroup> inputGroups) {
+        VBox formContainer = new VBox(3);
+        int numColumns = this.determineColumnsNumber(inputGroups);
+
+        for (int i = 0; i < inputGroups.size(); i += numColumns) {
+
+            HBox formRow;
+            if (i + (numColumns - 1) < inputGroups.size()) {
+                formRow = this.putInRow(inputGroups.subList(i, i + numColumns));
+            }
+            else {
+                List<FFGInputGroup> rowInputGroups = inputGroups.subList(i, inputGroups.size());
+                double rowWidth = (rowInputGroups.get(0).getMinMaxEditorWidth() * numColumns) + (10 * (numColumns - 1));
+                double rowWidthWithoutSpacing = rowWidth - ((rowInputGroups.size() - 1) * 10);
+                double adaptedColumnWidth = rowWidthWithoutSpacing / rowInputGroups.size();
+
+                rowInputGroups.stream().forEach(inputGroup -> inputGroup.setMinMaxEditorWidth(adaptedColumnWidth));
+                formRow = this.putInRow(inputGroups.subList(i, inputGroups.size()));
+            }
+
+            formContainer.getChildren().add(formRow);
+        }
+
+        return formContainer;
+    }
+
+    private VBox assemblySingleColumn(List<FFGInputGroup> inputGroups) {
+        VBox formContainer = new VBox(3);
+        for (FFGInputGroup inputGroup : inputGroups) {
+            formContainer.getChildren().add(inputGroup.buildAsVBox());
+        }
+
+        return formContainer;
+    }
+
+    private int determineColumnsNumber(List<FFGInputGroup> inputGroups) {
+        if (inputGroups.size() <= 6) {
+            return 2;
+        }
+        else if (inputGroups.size() <= 12) {
+            return 3;
+        }
+        else {
+            return 4;
+        }
+    }
+
+    private HBox putInRow(List<FFGInputGroup> inputGroups) {
+        HBox hBox = new HBox(10);
+
+        inputGroups.stream().forEach(inputGroup -> {
+            hBox.getChildren().add(inputGroup.buildAsVBox());
+        });
+
+        return hBox;
     }
 
     /**

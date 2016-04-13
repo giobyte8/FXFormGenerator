@@ -2,6 +2,7 @@ package org.fxformgenerator.samples;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import org.fxformgenerator.core.FFGLayout;
 import org.fxformgenerator.core.FXFormGenerator;
 import org.fxformgenerator.samples.models.User;
 
@@ -23,6 +24,7 @@ public class CustomLabelsForm extends Application {
                 .forModel(user)
                 .assignFieldLabel("fullName", "Nombre completo")
                 .assignFieldLabel("username", "Nombre de usuario")
+                .assignFormLayout(FFGLayout.SINGLE_COLUMN)
                 .showAsDialog(
                         "New user",
                         "Create new user account"

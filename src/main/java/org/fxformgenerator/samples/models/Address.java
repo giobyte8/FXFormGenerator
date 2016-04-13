@@ -11,6 +11,7 @@ public class Address {
     private StringProperty street = new SimpleStringProperty();
     private SimpleIntegerProperty postalCode = new SimpleIntegerProperty();
     private StringProperty city = new SimpleStringProperty();
+    private StringProperty state = new SimpleStringProperty();
 
     private BooleanProperty billingAddress = new SimpleBooleanProperty(true);
 
@@ -64,6 +65,18 @@ public class Address {
 
     public void setCity(String city) {
         this.city.set(city);
+    }
+
+    public String getState() {
+        return state.get();
+    }
+
+    public StringProperty stateProperty() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state.set(state);
     }
 
     public boolean getBillingAddress() {

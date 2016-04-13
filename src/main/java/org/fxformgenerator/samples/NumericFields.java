@@ -2,6 +2,7 @@ package org.fxformgenerator.samples;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import org.fxformgenerator.core.FFGLayout;
 import org.fxformgenerator.core.FXFormGenerator;
 import org.fxformgenerator.samples.models.Product;
 
@@ -22,7 +23,18 @@ public class NumericFields extends Application {
         FXFormGenerator
                 .forModel(product)
                 .assignFieldLabel("uniqueCode", "SKU")
-                .assignFieldsOrder("uniqueCode", "productName", "unitPrice")
+                .assignFieldLabel("adultsOnly", "Only for adults?")
+                .assignFieldLabel("originCountry", "Imported from country")
+                .assignFieldsOrder(
+                        "uniqueCode",
+                        "productName",
+                        "unitPrice",
+                        "taxPercent",
+                        "expirationDate",
+                        "provider",
+                        "adultsOnly",
+                        "originCountry")
+                .assignFormLayout(FFGLayout.MULTIPLE_FULLWIDTHROWS_COLUMNS)
                 .showAsDialog(
                         "New product",
                         "Create new product"

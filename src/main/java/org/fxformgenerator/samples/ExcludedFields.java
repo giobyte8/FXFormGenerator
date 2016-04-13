@@ -23,8 +23,8 @@ public class ExcludedFields extends Application {
                 .forModel(address)
                 .excludeFields("id")
                 .showAsDialog(
-                        "New user",
-                        "Create new user account"
+                        "New address",
+                        "Register user address"
                 );
     }
 }
