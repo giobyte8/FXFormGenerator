@@ -20,6 +20,7 @@ public class ExcludedFields extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.show();
+        primaryStage.hide();
 
         ObservableList<Object> availableStates = FXCollections.observableArrayList();
         availableStates.add(new State("Sonora", 17000000));
@@ -37,8 +38,13 @@ public class ExcludedFields extends Application {
                 .assignFieldOptions("state", availableStates)
                 .assignFieldOptions("postalCode", availablePCodes)
                 .showAsDialog(
-                        "New address",
-                        "Register user address"
+                        "Crear dirección",
+                        "Registrar nueva dirección",
+                        "Registrar",
+                        "Cancelar",
+                        o -> {
+                            System.out.println("Saving address ...");
+                        }
                 );
     }
 }

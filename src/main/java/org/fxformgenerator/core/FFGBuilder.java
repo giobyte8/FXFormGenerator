@@ -1,6 +1,7 @@
 package org.fxformgenerator.core;
 
 import javafx.collections.ObservableList;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.layout.VBox;
@@ -9,6 +10,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -218,25 +220,47 @@ public class FFGBuilder {
         return orderedFormProperties;
     }
 
+    public void showAsDialog(Consumer consumer) {
+        String dTitle = "Create new " + model.getClass().getName();
+        this.showAsDialog(dTitle, consumer);
+    }
+
+    public void showAsDialog(String dTitle, Consumer consumer) {
+        this.showAsDialog(dTitle, null, consumer);
+    }
+
+    public void showAsDialog(String dTitle, String dHeaderText, Consumer consumer) {
+        this.showAsDialog(dTitle, dHeaderText, "Save", "Cancel", consumer);
+    }
+
     /**
-     * Build ans shows the form as a {@link Dialog}
-     * TODO Add support to custom callback parameter
+     * Build and shows the form as a {@link Dialog}
      *
      * @param dTitle Passed directly to {@link Dialog#setTitle(String)}
      * @param dHeaderText Passed directly to {@link Dialog#setHeaderText(String)}
+     * @param okBtnText Text to put inside ok button
+     * @param cancelBtnText Text to put inside cancel button
+     * @param consumer Consumer to be called when ok button is pressed
      */
-    public void showAsDialog(String dTitle, String dHeaderText) {
+    public void showAsDialog(String dTitle, String dHeaderText, String okBtnText,
+                             String cancelBtnText, Consumer consumer) {
         VBox formContainer = this.build();
 
         Dialog dialog = new Dialog();
         dialog.setTitle(dTitle);
         dialog.setHeaderText(dHeaderText);
-        dialog.getDialogPane().getButtonTypes().addAll(
-                ButtonType.CANCEL,
-                ButtonType.OK
-        );
+
+        ButtonType okBtnType = new ButtonType(okBtnText, ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelBtnType = new ButtonType(cancelBtnText, ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().addAll(okBtnType, cancelBtnType);
 
         dialog.getDialogPane().setContent(formContainer);
-        dialog.showAndWait();
+        Optional result = dialog.showAndWait();
+
+        result.ifPresent(dialogBtn -> {
+            if (dialogBtn == okBtnType) {
+                consumer.accept(dialogBtn);
+            }
+        });
     }
 }

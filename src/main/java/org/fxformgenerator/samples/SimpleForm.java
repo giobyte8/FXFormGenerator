@@ -17,13 +17,13 @@ public class SimpleForm extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.show();
+        primaryStage.hide();
 
         User user = new User();
         FXFormGenerator
                 .forModel(user)
-                .showAsDialog(
-                        "New user",
-                        "Create new user account"
-                );
+                .showAsDialog(o -> {
+                    System.out.println("User object updated with form data");
+                });
     }
 }

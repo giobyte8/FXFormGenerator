@@ -18,6 +18,7 @@ public class NumericFields extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.show();
+        primaryStage.hide();
 
         Product product = new Product();
         FXFormGenerator
@@ -35,9 +36,8 @@ public class NumericFields extends Application {
                         "adultsOnly",
                         "originCountry")
                 .assignFormLayout(FFGLayout.MULTIPLE_FULLWIDTHROWS_COLUMNS)
-                .showAsDialog(
-                        "New product",
-                        "Create new product"
-                );
+                .showAsDialog(o -> {
+                    System.out.println("Saving product");
+                });
     }
 }

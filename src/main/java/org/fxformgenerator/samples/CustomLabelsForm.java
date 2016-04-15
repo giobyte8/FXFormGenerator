@@ -18,6 +18,7 @@ public class CustomLabelsForm extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.show();
+        primaryStage.hide();
 
         User user = new User();
         FXFormGenerator
@@ -26,8 +27,13 @@ public class CustomLabelsForm extends Application {
                 .assignFieldLabel("username", "Nombre de usuario")
                 .assignFormLayout(FFGLayout.SINGLE_COLUMN)
                 .showAsDialog(
-                        "New user",
-                        "Create new user account"
+                        "Crear usuario",
+                        "Ingrese los datos del usuario",
+                        o -> {
+                            System.out.println("Sending new user to backend");
+                            System.out.println("Username: " + user.getUsername());
+                            System.out.println("Fullname: " + user.getFullName());
+                        }
                 );
     }
 }
