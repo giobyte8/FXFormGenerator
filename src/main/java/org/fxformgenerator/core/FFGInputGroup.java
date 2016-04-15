@@ -1,5 +1,6 @@
 package org.fxformgenerator.core;
 
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -11,6 +12,7 @@ import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 
 /**
  * A Form input group represents an element that contains
@@ -24,25 +26,10 @@ public class FFGInputGroup {
     private String editorLB;
     private PropertyDescriptor propDesc;
 
+    private ObservableList<Object> fieldValues;
+
     private double minMaxEditorWidth = 220.0;
 
-
-    /**
-     * Constructs a new input group using the <code>editorLB</code> param
-     * as label text for editor's label.
-     *
-     * NOTE: Please be sure that #propDesc param has accessible setter and
-     * getter methods.
-     *
-     * @param model POJO owner of property to edit on this input group.
-     * @param editorLB display text for editor's label
-     * @param propDesc Property descriptor of edited property
-     */
-    public FFGInputGroup(Object model, String editorLB, PropertyDescriptor propDesc) {
-        this.model = model;
-        this.editorLB = editorLB;
-        this.propDesc = propDesc;
-    }
 
     /**
      * Constructs a new input group, if field referenced by <code>propDesc</code>
@@ -95,13 +82,28 @@ public class FFGInputGroup {
     public Node constructEditor() {
         Method getterMethod = propDesc.getReadMethod();
 
+        if (fieldValues != null && fieldValues.size() > 0) {
+            ChoiceBox<Object> fieldCB = new ChoiceBox();
+            fieldCB.setItems(this.fieldValues);
+
+            fieldCB.getSelectionModel()
+                    .selectedItemProperty()
+                    .addListener((obs, oldV, newV) -> {
+                this.updateFieldValue(newV);
+            });
+
+            fieldCB.getSelectionModel().select(getCurrentFieldValue(null));
+            fieldCB.setMinWidth(minMaxEditorWidth);
+            fieldCB.setMaxWidth(minMaxEditorWidth);
+            return fieldCB;
+        }
         if (getterMethod.getReturnType() == String.class) {
             TextField fieldTF = new TextField();
             fieldTF.textProperty().addListener((obs, oldV, newV) -> {
                 this.updateFieldValue(newV);
             });
 
-            fieldTF.setText(getCurrentValue().toString());
+            fieldTF.setText(getCurrentFieldValue("").toString());
             fieldTF.setMinWidth(minMaxEditorWidth);
             fieldTF.setMaxWidth(minMaxEditorWidth);
             return fieldTF;
@@ -112,7 +114,7 @@ public class FFGInputGroup {
                 this.updateFieldValue(newValue);
             });
 
-            fieldCB.setSelected((boolean) getCurrentValue());
+            fieldCB.setSelected((boolean) getCurrentFieldValue(false));
             fieldCB.setMinWidth(minMaxEditorWidth);
             fieldCB.setMaxWidth(minMaxEditorWidth);
             return fieldCB;
@@ -121,7 +123,7 @@ public class FFGInputGroup {
             Spinner fieldSP = new Spinner(new SpinnerValueFactory.IntegerSpinnerValueFactory(
                     Integer.MIN_VALUE,
                     Integer.MAX_VALUE,
-                    (int) getCurrentValue()
+                    (int) getCurrentFieldValue(0)
             ));
 
             // TODO Implement pure integer editable field
@@ -140,7 +142,7 @@ public class FFGInputGroup {
             Spinner fieldSP = new Spinner(new SpinnerValueFactory.DoubleSpinnerValueFactory(
                     Float.MIN_VALUE,
                     Float.MAX_VALUE,
-                    (float) getCurrentValue()
+                    (float) getCurrentFieldValue(0.0)
             ));
 
             // TODO Implement pure float editable field
@@ -159,7 +161,7 @@ public class FFGInputGroup {
             Spinner fieldSP = new Spinner(new SpinnerValueFactory.DoubleSpinnerValueFactory(
                     Double.MIN_VALUE,
                     Double.MAX_VALUE,
-                    (double) getCurrentValue()
+                    (double) getCurrentFieldValue(0.0)
             ));
 
             // TODO Implement pure double editable field
@@ -178,7 +180,10 @@ public class FFGInputGroup {
             DatePicker fieldDP = new DatePicker();
             fieldDP.getEditor().setEditable(false);
 
-            LocalDate date = ((Date) getCurrentValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate date = ((Date) getCurrentFieldValue(new Date()))
+                    .toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
             fieldDP.setValue(date);
 
             fieldDP.setMinWidth(minMaxEditorWidth);
@@ -189,6 +194,10 @@ public class FFGInputGroup {
         return null;
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+
     /**
      * Invokes to the setter method over #propDesc
      * with given param value
@@ -197,12 +206,37 @@ public class FFGInputGroup {
      */
     private void updateFieldValue(Object newValue) {
         try {
-            propDesc.getWriteMethod().invoke(model, newValue);
+            if (isWrapperType(propDesc.getPropertyType())) {
+                propDesc.getWriteMethod().invoke(model, newValue);
+            }
+            else {
+                propDesc.getWriteMethod().invoke(
+                        model,
+                        propDesc.getPropertyType().cast(newValue)
+                );
+            }
         }
         catch (IllegalAccessException | InvocationTargetException e) {
             System.err.println("Can not invoke setter method");
             System.err.println(e.getMessage());
         }
+    }
+
+    private boolean isWrapperType(Class<?> clazz) {
+        return clazz.equals(Boolean.class)    ||
+                clazz.equals(boolean.class)   ||
+                clazz.equals(Character.class) ||
+                clazz.equals(char.class)      ||
+                clazz.equals(Short.class)     ||
+                clazz.equals(short.class)     ||
+                clazz.equals(Integer.class)   ||
+                clazz.equals(int.class)       ||
+                clazz.equals(Long.class)      ||
+                clazz.equals(long.class)      ||
+                clazz.equals(Double.class)    ||
+                clazz.equals(double.class)    ||
+                clazz.equals(Float.class)     ||
+                clazz.equals(float.class);
     }
 
     /**
@@ -211,14 +245,14 @@ public class FFGInputGroup {
      *
      * @return
      */
-    private Object getCurrentValue() {
+    private Object getCurrentFieldValue(Object defaultValue) {
         try {
             Object value = propDesc.getReadMethod().invoke(model);
-            return value != null ? value : "";
+            return value != null ? value : defaultValue;
         }
         catch (InvocationTargetException | IllegalAccessException e) {
             System.err.println("Can not invoke getter method");
-            return "";
+            return defaultValue;
         }
     }
 
@@ -228,5 +262,13 @@ public class FFGInputGroup {
 
     public void setMinMaxEditorWidth(double minMaxEditorWidth) {
         this.minMaxEditorWidth = minMaxEditorWidth;
+    }
+
+    public void setEditorLBText(String text) {
+        this.editorLB = text;
+    }
+
+    public void setFieldValues(ObservableList<Object> fieldValues) {
+        this.fieldValues = fieldValues;
     }
 }

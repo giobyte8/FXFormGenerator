@@ -1,5 +1,6 @@
 package org.fxformgenerator.core;
 
+import javafx.collections.ObservableList;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.layout.VBox;
@@ -21,6 +22,12 @@ public class FFGBuilder {
 
     /** Custom labels to use in form fields */
     private Map<String, String> fieldLabels = new HashMap<>();
+
+    /**
+     * Stores a list with maps representing multiple options
+     * for POJO properties
+     */
+    private Map<String, ObservableList<Object>> fieldsValues = new HashMap();
 
     /**
      * Contains each form's fields in corresponding order to be
@@ -114,6 +121,20 @@ public class FFGBuilder {
         return this;
     }
 
+    /**
+     * Assigns a list of possible options for a given field (Usually an object
+     * type field) In this case, FFG will create a ChoiceBox for this property
+     * with given options.
+     *
+     * @param field
+     * @param options
+     * @return
+     */
+    public FFGBuilder assignFieldOptions(String field, ObservableList<Object> options) {
+        this.fieldsValues.put(field, options);
+        return this;
+    }
+
     public FFGBuilder assignFormLayout(int formLayout) {
         assembler.assignFormLayout(formLayout);
         return this;
@@ -128,16 +149,17 @@ public class FFGBuilder {
 
         // Recover all properties to be added to form
         for (PropertyDescriptor pDesc : getFormProperties()) {
+            FFGInputGroup ig = new FFGInputGroup(model, pDesc);
+
             if (fieldLabels.containsKey(pDesc.getName())) {
-                inputGroups.add(new FFGInputGroup(
-                        model,
-                        fieldLabels.get(pDesc.getName()),
-                        pDesc
-                ));
+                ig.setEditorLBText(fieldLabels.get(pDesc.getName()));
             }
-            else {
-                inputGroups.add(new FFGInputGroup(model, pDesc));
+
+            if (fieldsValues.containsKey(pDesc.getName())) {
+                ig.setFieldValues(fieldsValues.get(pDesc.getName()));
             }
+
+            inputGroups.add(ig);
         }
 
         // Assembly all form nodes into a single VBox parent
