@@ -9,10 +9,10 @@ import javafx.scene.layout.VBox;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.List;
 
 /**
  * A Form input group represents an element that contains
@@ -147,7 +147,7 @@ public class FFGInputGroup {
 
             // TODO Implement pure float editable field
             // fieldSP.getEditor().setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 0));
-            // fieldSP.setEditable(true);
+            fieldSP.setEditable(true);
 
             fieldSP.getEditor().textProperty().addListener((obs, oldV, newV) -> {
                 this.updateFieldValue(Float.parseFloat(newV));
@@ -166,7 +166,7 @@ public class FFGInputGroup {
 
             // TODO Implement pure double editable field
             // fieldSP.getEditor().setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 0));
-            // fieldSP.setEditable(true);
+            fieldSP.setEditable(true);
 
             fieldSP.getEditor().textProperty().addListener((obs, oldV, newV) -> {
                 this.updateFieldValue(Double.parseDouble(newV));
@@ -185,6 +185,24 @@ public class FFGInputGroup {
                     .atZone(ZoneId.systemDefault())
                     .toLocalDate();
             fieldDP.setValue(date);
+
+            fieldDP.valueProperty().addListener((obs, oldV, newV) -> {
+                Date nDate = Date.from(Instant.from(newV.atStartOfDay(ZoneId.systemDefault())));
+                updateFieldValue(nDate);
+            });
+
+            fieldDP.setMinWidth(minMaxEditorWidth);
+            fieldDP.setMaxWidth(minMaxEditorWidth);
+            return fieldDP;
+        }
+        else if (getterMethod.getReturnType() == LocalDate.class) {
+            DatePicker fieldDP = new DatePicker();
+            fieldDP.getEditor().setEditable(false);
+
+            fieldDP.setValue((LocalDate) getCurrentFieldValue(LocalDate.now()));
+            fieldDP.valueProperty().addListener((obs, oldV, newV) -> {
+                updateFieldValue(newV);
+            });
 
             fieldDP.setMinWidth(minMaxEditorWidth);
             fieldDP.setMaxWidth(minMaxEditorWidth);
