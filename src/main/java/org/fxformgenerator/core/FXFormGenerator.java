@@ -5,6 +5,7 @@ package org.fxformgenerator.core;
  *
  * @version 0.1
  * On date: May 05, 2016
+ *
  */
 public class FXFormGenerator {
 
