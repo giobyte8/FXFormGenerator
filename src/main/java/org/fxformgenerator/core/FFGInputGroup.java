@@ -171,10 +171,15 @@ public class FFGInputGroup {
 
             // TODO Implement pure integer editable field
             // fieldSP.getEditor().setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 0));
-            // fieldSP.setEditable(true);
+            fieldSP.setEditable(true);
 
             fieldSP.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
-                this.updateFieldValue(Integer.parseInt(newValue));
+                if (FFGUtils.isInteger(newValue)) {
+                    this.updateFieldValue(Integer.parseInt(newValue));
+                }
+                else {
+                    this.updateFieldValue(0);
+                }
             });
 
             fieldSP.setMinWidth(minMaxEditorWidth);
@@ -193,7 +198,12 @@ public class FFGInputGroup {
             fieldSP.setEditable(true);
 
             fieldSP.getEditor().textProperty().addListener((obs, oldV, newV) -> {
-                this.updateFieldValue(Float.parseFloat(newV));
+                if (FFGUtils.isFloat(newV)) {
+                    this.updateFieldValue(Float.parseFloat(newV));
+                }
+                else {
+                    this.updateFieldValue(0);
+                }
             });
 
             fieldSP.setMinWidth(minMaxEditorWidth);
@@ -212,7 +222,12 @@ public class FFGInputGroup {
             fieldSP.setEditable(true);
 
             fieldSP.getEditor().textProperty().addListener((obs, oldV, newV) -> {
-                this.updateFieldValue(Double.parseDouble(newV));
+                if (FFGUtils.isDouble(newV)) {
+                    this.updateFieldValue(Double.parseDouble(newV));
+                }
+                else {
+                    this.updateFieldValue(0);
+                }
             });
 
             fieldSP.setMinWidth(minMaxEditorWidth);
@@ -221,7 +236,7 @@ public class FFGInputGroup {
         }
         else if (getterMethod.getReturnType() == Date.class) {
             DatePicker fieldDP = new DatePicker();
-            fieldDP.getEditor().setEditable(false);
+            fieldDP.setEditable(false);
 
             LocalDate date = ((Date) getCurrentFieldValue(new Date()))
                     .toInstant()
@@ -230,8 +245,13 @@ public class FFGInputGroup {
             fieldDP.setValue(date);
 
             fieldDP.valueProperty().addListener((obs, oldV, newV) -> {
-                Date nDate = Date.from(Instant.from(newV.atStartOfDay(ZoneId.systemDefault())));
-                updateFieldValue(nDate);
+                if (newV != null) {
+                    Date nDate = Date.from(Instant.from(newV.atStartOfDay(ZoneId.systemDefault())));
+                    updateFieldValue(nDate);
+                }
+                else {
+                    updateFieldValue(null);
+                }
             });
 
             fieldDP.setMinWidth(minMaxEditorWidth);
@@ -240,7 +260,7 @@ public class FFGInputGroup {
         }
         else if (getterMethod.getReturnType() == LocalDate.class) {
             DatePicker fieldDP = new DatePicker();
-            fieldDP.getEditor().setEditable(false);
+            fieldDP.setEditable(false);
 
             fieldDP.setValue((LocalDate) getCurrentFieldValue(LocalDate.now()));
             fieldDP.valueProperty().addListener((obs, oldV, newV) -> {

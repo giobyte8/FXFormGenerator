@@ -22,4 +22,34 @@ public class FFGUtils {
 
         return humanReadable.toString();
     }
+
+    public static boolean isFloat(String strValue) {
+        try {
+            Float.parseFloat(strValue);
+            return true;
+        }
+        catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static boolean isDouble(String strValue) {
+        try {
+            Double.parseDouble(strValue);
+            return true;
+        }
+        catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static boolean isInteger(String strValue) {
+        try {
+            Integer.parseInt(strValue);
+            return true;
+        }
+        catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }
