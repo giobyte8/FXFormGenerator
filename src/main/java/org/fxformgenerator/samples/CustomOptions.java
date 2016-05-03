@@ -79,6 +79,14 @@ public class CustomOptions extends Application {
                 .showAsDialog(
                         o -> {
 
+                            //
+                            // Display input values in read only form
+                            FXFormGenerator
+                                    .forModel(employee)
+                                    .enableReadOnlyMode()
+                                    .showAsDialog(p -> {
+
+                                    });
                         }
                 );
     }

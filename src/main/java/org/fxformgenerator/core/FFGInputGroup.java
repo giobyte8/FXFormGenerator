@@ -28,6 +28,9 @@ public class FFGInputGroup {
     private Node customEditor;
     private PropertyDescriptor propDesc;
 
+    /** If true, node editor will be a label with property current value */
+    private boolean readOnly;
+
     private ObservableList<Object> fieldValues;
 
     private double minMaxEditorWidth = 220.0;
@@ -68,9 +71,16 @@ public class FFGInputGroup {
         vBox.setPadding(new Insets(10.0, 0, 0, 0));
 
         Label fieldLB    = new Label(editorLB);
-        Node fieldEditor = this.constructEditor();
+        Node fieldEditor = this.readOnly
+                ? constructValueLabel()
+                : constructEditor();
 
         vBox.getChildren().addAll(fieldLB, fieldEditor);
+
+        // Add bold style to label if necessary
+        if (this.readOnly) {
+            fieldLB.setStyle("-fx-font-weight: bold");
+        }
 
         // Add validation message if necessary
         if (this.validationMessage != null && this.validationMessage.length() > 0) {
@@ -245,6 +255,21 @@ public class FFGInputGroup {
         return null;
     }
 
+    /**
+     * Creates a label with the current property value
+     *
+     * @return The generated label with min/max width assigned and word wrap
+     *         enabled.
+     */
+    public Label constructValueLabel() {
+        Label readOnlyLB = new Label(getCurrentFieldValue("").toString());
+        readOnlyLB.setMinWidth(minMaxEditorWidth);
+        readOnlyLB.setMaxWidth(minMaxEditorWidth);
+        readOnlyLB.setWrapText(true);
+
+        return readOnlyLB;
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -337,5 +362,13 @@ public class FFGInputGroup {
 
     public void setCustomEditor(Node customEditor) {
         this.customEditor = customEditor;
+    }
+
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
     }
 }

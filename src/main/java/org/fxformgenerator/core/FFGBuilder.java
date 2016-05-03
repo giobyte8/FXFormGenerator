@@ -52,6 +52,9 @@ public class FFGBuilder {
 
     private boolean useValidation = false;
 
+    /** If true, form is generated with labels instead of editor nodes */
+    private boolean readOnlyMode = false;
+
 
     public FFGBuilder(Object model) {
         this.model = model;
@@ -100,6 +103,11 @@ public class FFGBuilder {
             fieldLabels.put(entry.getKey(), entry.getValue());
         }
 
+        return this;
+    }
+
+    public FFGBuilder enableReadOnlyMode() {
+        this.readOnlyMode = true;
         return this;
     }
 
@@ -210,6 +218,7 @@ public class FFGBuilder {
                 ig.setValidationMessage(validationMessages.get(pDesc.getName()));
             }
 
+            ig.setReadOnly(readOnlyMode);
             inputGroups.add(ig);
         }
 
@@ -293,30 +302,34 @@ public class FFGBuilder {
      */
     public void showAsDialog(String dTitle, String dHeaderText, String okBtnText,
                              String cancelBtnText, Consumer consumer) {
-        VBox formContainer = this.build();
 
         Dialog dialog = new Dialog();
         dialog.setTitle(dTitle);
         dialog.setHeaderText(dHeaderText);
+        dialog.getDialogPane().setContent(this.build());
 
-        ButtonType okBtnType = new ButtonType(okBtnText, ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancelBtnType = new ButtonType(cancelBtnText, ButtonBar.ButtonData.CANCEL_CLOSE);
-        dialog.getDialogPane().getButtonTypes().addAll(okBtnType, cancelBtnType);
+        if (this.readOnlyMode) {
+            ButtonType okBtnType = new ButtonType(okBtnText, ButtonBar.ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().add(okBtnType);
+            dialog.showAndWait();
+        }
+        else {
+            ButtonType okBtnType = new ButtonType(okBtnText, ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancelBtnType = new ButtonType(cancelBtnText, ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialog.getDialogPane().getButtonTypes().addAll(okBtnType, cancelBtnType);
 
-        dialog.getDialogPane().setContent(formContainer);
-        Optional result = dialog.showAndWait();
-
-        result.ifPresent(dialogBtn -> {
-            if (dialogBtn == okBtnType) {
-                if (!this.useValidation || this.validateModel()) {
-                    consumer.accept(dialogBtn);
+            dialog.showAndWait().ifPresent(dialogBtn -> {
+                if (dialogBtn == okBtnType) {
+                    if (!this.useValidation || this.validateModel()) {
+                        consumer.accept(dialogBtn);
+                    }
+                    else {
+                        retrieveConstraintViolationMessages();
+                        this.showAsDialog(dTitle, dHeaderText, okBtnText, cancelBtnText, consumer);
+                    }
                 }
-                else {
-                    retrieveConstraintViolationMessages();
-                    this.showAsDialog(dTitle, dHeaderText, okBtnText, cancelBtnText, consumer);
-                }
-            }
-        });
+            });
+        }
     }
 
     private boolean validateModel() {
