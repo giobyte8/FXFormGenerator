@@ -6,6 +6,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.layout.VBox;
 
+import javax.validation.ConstraintViolation;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
  */
 public class FFGBuilder {
     private FFGFieldsAssembler assembler = new FFGFieldsAssembler();
+    private FFGModelValidator mValidator = new FFGModelValidator();
 
     /** POJO To edit in this form */
     private Object model;
@@ -39,6 +41,12 @@ public class FFGBuilder {
 
     /** Name of fields that will be ignored on form creation */
     private List<String> excludedFields = new ArrayList<>();
+
+    /** Stores each validation message */
+    private Map<String, String> validationMessages = new HashMap<>();
+
+    private boolean useValidation = false;
+
 
     public FFGBuilder(Object model) {
         this.model = model;
@@ -75,6 +83,11 @@ public class FFGBuilder {
         return this;
     }
 
+    public FFGBuilder enableValidation(boolean useValidation) {
+        this.useValidation = useValidation;
+        return this;
+    }
+
     /**
      * Excludes a field from form.
      * FXFormGenerator will not generate form input for this field
@@ -108,7 +121,7 @@ public class FFGBuilder {
     }
 
     /**
-     * Sets the order to display fields into form.
+     * Sets the order to display fields into form.  <br/>
      * NOTE: Fields not included in param <code>orderedFields</code> will be
      * added after ordered fields.
      *
@@ -159,6 +172,10 @@ public class FFGBuilder {
 
             if (fieldsValues.containsKey(pDesc.getName())) {
                 ig.setFieldValues(fieldsValues.get(pDesc.getName()));
+            }
+
+            if (validationMessages.containsKey(pDesc.getName())) {
+                ig.setValidationMessage(validationMessages.get(pDesc.getName()));
             }
 
             inputGroups.add(ig);
@@ -259,8 +276,39 @@ public class FFGBuilder {
 
         result.ifPresent(dialogBtn -> {
             if (dialogBtn == okBtnType) {
-                consumer.accept(dialogBtn);
+                if (!this.useValidation || this.validateModel()) {
+                    consumer.accept(dialogBtn);
+                }
+                else {
+                    retrieveConstraintViolationMessages();
+                    this.showAsDialog(dTitle, dHeaderText, okBtnText, cancelBtnText, consumer);
+                }
             }
         });
     }
+
+    public boolean validateModel() {
+        return FFGModelValidator.isModelValid(model);
+    }
+
+    /**
+     * Puts each validation messages into {@link #validationMessages}
+     * using the property name as key and message as value.
+     *
+     * NOTE: Validation messages will appear into form on next rendering/showAsDialog
+     * call.
+     */
+    private void retrieveConstraintViolationMessages() {
+        validationMessages.clear();
+        Set<ConstraintViolation<Object>> violations =
+                FFGModelValidator.getViolatedConstraints(model);
+
+        for (ConstraintViolation<Object> cViolation : violations) {
+            String propertyName = cViolation.getPropertyPath().iterator().next().getName();
+            String validationMessage = cViolation.getMessage();
+
+            validationMessages.put(propertyName, validationMessage);
+        }
+    }
+
 }

@@ -24,6 +24,7 @@ public class FFGInputGroup {
 
     private Object model;
     private String editorLB;
+    private String validationMessage;
     private PropertyDescriptor propDesc;
 
     private ObservableList<Object> fieldValues;
@@ -69,6 +70,15 @@ public class FFGInputGroup {
         Node fieldEditor = this.constructEditor();
 
         vBox.getChildren().addAll(fieldLB, fieldEditor);
+
+        // Add validation message if necessary
+        if (this.validationMessage != null && this.validationMessage.length() > 0) {
+
+            // TODO Add error styles to label
+            Label errorLB = new Label(validationMessage);
+            vBox.getChildren().add(errorLB);
+        }
+
         return vBox;
     }
 
@@ -288,5 +298,13 @@ public class FFGInputGroup {
 
     public void setFieldValues(ObservableList<Object> fieldValues) {
         this.fieldValues = fieldValues;
+    }
+
+    public String getValidationMessage() {
+        return validationMessage;
+    }
+
+    public void setValidationMessage(String validationMessage) {
+        this.validationMessage = validationMessage;
     }
 }
