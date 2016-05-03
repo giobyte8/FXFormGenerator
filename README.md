@@ -19,6 +19,7 @@ Create a form from your POJO instances, use it as is or customize it with throug
  * Form validation through java validation API (Error labels into form).
  * Display the form as a Dialog or
  * Construct the form and return it as a Node to be included into your UI components.
+ * Display the form in read * only mode using * labels to display POJO properties values.
 
 #### Aesthetic
  * Assign custom text for each field label
