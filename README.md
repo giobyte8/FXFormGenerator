@@ -1,6 +1,20 @@
 # FXFormGenerator
 Automatic form generation for JavaFX 8.
-Create a form from your POJO instances, use it as is or customize it with through a powerful API.
+
+Create a form from your POJO instances, use it as is or customize it through the powerful API.
+
+```java
+
+    Pojo pojo = new Pojo();
+    FXFormGenerator
+        .forModel(pojo)
+        .showAsDialog(o -> {
+
+            // Callback is executed after user fill pojo properties on form inputs
+            System.out.println("Now POJO object is updated with form data");
+        });
+
+```
 
 ## Features
 
@@ -21,7 +35,7 @@ Create a form from your POJO instances, use it as is or customize it with throug
  * Construct the form and return it as a Node to be included into your UI components.
  * Display the form in read * only mode using * labels to display POJO properties values.
 
-#### Aesthetic
+#### Aesthetic features
  * Assign custom text for each field label
  * Assign custom order for the form fields
  * Configure the inputs distribution layout (Single column | Multiple columns | Multiple (Fill width rows) columns)
