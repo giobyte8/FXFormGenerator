@@ -18,7 +18,7 @@ public class HValidation extends Application {
 
         FXFormGenerator
                 .forModel(new Artist())
-                .enableValidation(true)
+                .enableValidation()
                 .showAsDialog(o -> {
 
                 });

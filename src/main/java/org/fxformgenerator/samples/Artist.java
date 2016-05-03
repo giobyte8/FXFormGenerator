@@ -22,7 +22,7 @@ public class Artist {
     ////////////////////////////////////////////////////////////////////////////
     // Getter and setters (With validation constraints)
 
-    @NotNull
+    @NotNull(message = "El nombre publico es requerido")
     @Size(min = 2, max = 10, message = "Debe tener entre 2 y 10 caracteres")
     public String getPublicName() {
         return publicName.get();

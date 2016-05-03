@@ -1,6 +1,7 @@
 package org.fxformgenerator.core;
 
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
  */
 public class FFGBuilder {
     private FFGFieldsAssembler assembler = new FFGFieldsAssembler();
-    private FFGModelValidator mValidator = new FFGModelValidator();
 
     /** POJO To edit in this form */
     private Object model;
@@ -32,6 +32,11 @@ public class FFGBuilder {
      * for POJO properties
      */
     private Map<String, ObservableList<Object>> fieldsValues = new HashMap();
+
+    /**
+     * A list with custom editors for model properties
+     */
+    private Map<String, Node> fieldsEditors = new HashMap<>();
 
     /**
      * Contains each form's fields in corresponding order to be
@@ -55,6 +60,21 @@ public class FFGBuilder {
 
     ////////////////////////////////////////////////////////////////////////////
     // User customization methods
+
+    /**
+     * Assign a custom editor for a given model property. FXFormGenerator
+     * only will render the node in the place for field editor.            <br/>
+     * You're responsible of Node behavior and binding node value
+     * changes to model property value.
+     *
+     * @param field  Field to edit in custom editor node
+     * @param editor Node to render in place for field editor
+     * @return A FFGBuilder with the assigned field editors
+     */
+    public FFGBuilder assignFieldEditor(String field, Node editor) {
+        this.fieldsEditors.put(field, editor);
+        return this;
+    }
 
     /**
      * Assign a custom editor label to a field
@@ -83,8 +103,16 @@ public class FFGBuilder {
         return this;
     }
 
-    public FFGBuilder enableValidation(boolean useValidation) {
-        this.useValidation = useValidation;
+    /**
+     * Enable model validation through Hibernate Validator.
+     * On 'Show as dialog', the model will be validated when user clicks
+     * on save button, if model does not pass validation the dialog will be
+     * rendered with the validation error messages.
+     *
+     * @return A references to FFGBuilder with validation enabled
+     */
+    public FFGBuilder enableValidation() {
+        this.useValidation = true;
         return this;
     }
 
@@ -165,6 +193,10 @@ public class FFGBuilder {
         // Recover all properties to be added to form
         for (PropertyDescriptor pDesc : getFormProperties()) {
             FFGInputGroup ig = new FFGInputGroup(model, pDesc);
+
+            if (fieldsEditors.containsKey(pDesc.getName())) {
+                ig.setCustomEditor(fieldsEditors.get(pDesc.getName()));
+            }
 
             if (fieldLabels.containsKey(pDesc.getName())) {
                 ig.setEditorLBText(fieldLabels.get(pDesc.getName()));
@@ -287,7 +319,7 @@ public class FFGBuilder {
         });
     }
 
-    public boolean validateModel() {
+    private boolean validateModel() {
         return FFGModelValidator.isModelValid(model);
     }
 

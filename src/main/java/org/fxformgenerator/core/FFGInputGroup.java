@@ -25,6 +25,7 @@ public class FFGInputGroup {
     private Object model;
     private String editorLB;
     private String validationMessage;
+    private Node customEditor;
     private PropertyDescriptor propDesc;
 
     private ObservableList<Object> fieldValues;
@@ -74,8 +75,10 @@ public class FFGInputGroup {
         // Add validation message if necessary
         if (this.validationMessage != null && this.validationMessage.length() > 0) {
 
-            // TODO Add error styles to label
             Label errorLB = new Label(validationMessage);
+            errorLB.setStyle("-fx-text-fill: #E74C3C");
+            errorLB.setMaxWidth(minMaxEditorWidth);
+            errorLB.setWrapText(true);
             vBox.getChildren().add(errorLB);
         }
 
@@ -92,7 +95,27 @@ public class FFGInputGroup {
     public Node constructEditor() {
         Method getterMethod = propDesc.getReadMethod();
 
-        if (fieldValues != null && fieldValues.size() > 0) {
+        if (customEditor != null) {
+            if (customEditor instanceof ChoiceBox) {
+                ((ChoiceBox) customEditor).setMinWidth(minMaxEditorWidth);
+                ((ChoiceBox) customEditor).setMaxWidth(minMaxEditorWidth);
+            }
+            else if (customEditor instanceof TextArea) {
+                ((TextArea) customEditor).setMinWidth(minMaxEditorWidth);
+                ((TextArea) customEditor).setMaxWidth(minMaxEditorWidth);
+            }
+            else if (customEditor instanceof TextField) {
+                ((TextField) customEditor).setMinWidth(minMaxEditorWidth);
+                ((TextField) customEditor).setMaxWidth(minMaxEditorWidth);
+            }
+            else if (customEditor instanceof Spinner) {
+                ((Spinner) customEditor).setMinWidth(minMaxEditorWidth);
+                ((Spinner) customEditor).setMaxWidth(minMaxEditorWidth);
+            }
+
+            return customEditor;
+        }
+        else if (fieldValues != null && fieldValues.size() > 0) {
             ChoiceBox<Object> fieldCB = new ChoiceBox();
             fieldCB.setItems(this.fieldValues);
 
@@ -107,7 +130,7 @@ public class FFGInputGroup {
             fieldCB.setMaxWidth(minMaxEditorWidth);
             return fieldCB;
         }
-        if (getterMethod.getReturnType() == String.class) {
+        else if (getterMethod.getReturnType() == String.class) {
             TextField fieldTF = new TextField();
             fieldTF.textProperty().addListener((obs, oldV, newV) -> {
                 this.updateFieldValue(newV);
@@ -306,5 +329,13 @@ public class FFGInputGroup {
 
     public void setValidationMessage(String validationMessage) {
         this.validationMessage = validationMessage;
+    }
+
+    public Node getCustomEditor() {
+        return customEditor;
+    }
+
+    public void setCustomEditor(Node customEditor) {
+        this.customEditor = customEditor;
     }
 }
