@@ -5,13 +5,13 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import org.fxformgenerator.core.readonly.AbstractValueFormatter;
+import org.fxformgenerator.core.readonly.DefaultValueFormatter;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 
 /**
@@ -34,6 +34,8 @@ public class FFGInputGroup {
     private ObservableList<Object> fieldValues;
 
     private double minMaxEditorWidth = 220.0;
+
+    private AbstractValueFormatter valueFormatter = new DefaultValueFormatter();
 
 
     /**
@@ -238,15 +240,12 @@ public class FFGInputGroup {
             DatePicker fieldDP = new DatePicker();
             fieldDP.setEditable(false);
 
-            LocalDate date = ((Date) getCurrentFieldValue(new Date()))
-                    .toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate();
+            LocalDate date = FFGUtils.toLocalDate((Date) getCurrentFieldValue(new Date()));
             fieldDP.setValue(date);
 
             fieldDP.valueProperty().addListener((obs, oldV, newV) -> {
                 if (newV != null) {
-                    Date nDate = Date.from(Instant.from(newV.atStartOfDay(ZoneId.systemDefault())));
+                    Date nDate = FFGUtils.toDate(newV);
                     updateFieldValue(nDate);
                 }
                 else {
@@ -276,13 +275,27 @@ public class FFGInputGroup {
     }
 
     /**
+     * TODO Add support to use custom user formatters
      * Creates a label with the current property value
      *
      * @return The generated label with min/max width assigned and word wrap
      *         enabled.
      */
     public Label constructValueLabel() {
-        Label readOnlyLB = new Label(getCurrentFieldValue("").toString());
+        Method getterMethod = propDesc.getReadMethod();
+        String labelValue;
+
+        if (getterMethod.getReturnType() == boolean.class) {
+            labelValue = valueFormatter.format((boolean) getCurrentFieldValue(false));
+        }
+        else if (getterMethod.getReturnType() == Date.class) {
+            labelValue = valueFormatter.format((Date) getCurrentFieldValue(new Date()));
+        }
+        else {
+            labelValue = getCurrentFieldValue("").toString();
+        }
+
+        Label readOnlyLB = new Label(labelValue);
         readOnlyLB.setMinWidth(minMaxEditorWidth);
         readOnlyLB.setMaxWidth(minMaxEditorWidth);
         readOnlyLB.setWrapText(true);
@@ -390,5 +403,13 @@ public class FFGInputGroup {
 
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
+    }
+
+    public AbstractValueFormatter getValueFormatter() {
+        return valueFormatter;
+    }
+
+    public void setValueFormatter(AbstractValueFormatter valueFormatter) {
+        this.valueFormatter = valueFormatter;
     }
 }

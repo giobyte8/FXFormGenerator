@@ -1,5 +1,9 @@
 package org.fxformgenerator.core;
 
+import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Created by giovanni on 4/7/16.
  */
@@ -51,5 +55,29 @@ public class FFGUtils {
         catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    public static Date toDate(LocalDate localDate) {
+        int day   = localDate.getDayOfMonth();
+        int month = localDate.getMonthValue();
+        int year  = localDate.getYear();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DATE, day);
+        calendar.set(Calendar.MONTH, --month);
+        calendar.set(Calendar.YEAR, year);
+
+        return calendar.getTime();
+    }
+
+    public static LocalDate toLocalDate(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+
+        return LocalDate.of(
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH) + 1,
+                calendar.get(Calendar.DATE)
+        );
     }
 }
