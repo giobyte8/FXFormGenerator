@@ -275,32 +275,59 @@ public class FFGInputGroup {
     }
 
     /**
-     * TODO Add support to use custom user formatters
+     * TODO Add support to use custom user formaters
      * Creates a label with the current property value
      *
      * @return The generated label with min/max width assigned and word wrap
      *         enabled.
      */
-    public Label constructValueLabel() {
-        Method getterMethod = propDesc.getReadMethod();
-        String labelValue;
+    public Node constructValueLabel() {
+        if (customEditor != null) {
+            if (customEditor instanceof ChoiceBox) {
+                ((ChoiceBox) customEditor).setMinWidth(minMaxEditorWidth);
+                ((ChoiceBox) customEditor).setMaxWidth(minMaxEditorWidth);
+            }
+            else if (customEditor instanceof TextArea) {
+                ((TextArea) customEditor).setMinWidth(minMaxEditorWidth);
+                ((TextArea) customEditor).setMaxWidth(minMaxEditorWidth);
+            }
+            else if (customEditor instanceof TextField) {
+                ((TextField) customEditor).setMinWidth(minMaxEditorWidth);
+                ((TextField) customEditor).setMaxWidth(minMaxEditorWidth);
+            }
+            else if (customEditor instanceof Spinner) {
+                ((Spinner) customEditor).setMinWidth(minMaxEditorWidth);
+                ((Spinner) customEditor).setMaxWidth(minMaxEditorWidth);
+            }
+            else if (customEditor instanceof Label) {
+                ((Label) customEditor).setMinWidth(minMaxEditorWidth);
+                ((Label) customEditor).setMaxWidth(minMaxEditorWidth);
+                ((Label) customEditor).setWrapText(true);
+            }
 
-        if (getterMethod.getReturnType() == boolean.class) {
-            labelValue = valueFormatter.format((boolean) getCurrentFieldValue(false));
-        }
-        else if (getterMethod.getReturnType() == Date.class) {
-            labelValue = valueFormatter.format((Date) getCurrentFieldValue(new Date()));
+            return customEditor;
         }
         else {
-            labelValue = getCurrentFieldValue("").toString();
+            Method getterMethod = propDesc.getReadMethod();
+            String labelValue;
+
+            if (getterMethod.getReturnType() == boolean.class) {
+                labelValue = valueFormatter.format((boolean) getCurrentFieldValue(false));
+            }
+            else if (getterMethod.getReturnType() == Date.class) {
+                labelValue = valueFormatter.format((Date) getCurrentFieldValue(new Date()));
+            }
+            else {
+                labelValue = getCurrentFieldValue("").toString();
+            }
+
+            Label readOnlyLB = new Label(labelValue);
+            readOnlyLB.setMinWidth(minMaxEditorWidth);
+            readOnlyLB.setMaxWidth(minMaxEditorWidth);
+            readOnlyLB.setWrapText(true);
+
+            return readOnlyLB;
         }
-
-        Label readOnlyLB = new Label(labelValue);
-        readOnlyLB.setMinWidth(minMaxEditorWidth);
-        readOnlyLB.setMaxWidth(minMaxEditorWidth);
-        readOnlyLB.setWrapText(true);
-
-        return readOnlyLB;
     }
 
 
