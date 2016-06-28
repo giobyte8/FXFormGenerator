@@ -14,6 +14,9 @@ import java.util.List;
 public class FFGFieldsAssembler {
     private int formLayout = FFGLayout.MULTIPLE_COLUMNS;
 
+    /** If > 0, Layout will be forced to use this number of columns  */
+    private int numberOfColumns = -1;
+
     /**
      * Assembly all form nodes into a single VBox parent
      * @return A VBox containing each row from forms
@@ -92,7 +95,10 @@ public class FFGFieldsAssembler {
     }
 
     private int determineColumnsNumber(List<FFGInputGroup> inputGroups) {
-        if (inputGroups.size() <= 6) {
+        if (numberOfColumns > 0) {
+            return numberOfColumns;
+        }
+        else if (inputGroups.size() <= 6) {
             return 2;
         }
         else if (inputGroups.size() <= 12) {
@@ -111,5 +117,15 @@ public class FFGFieldsAssembler {
         });
 
         return hBox;
+    }
+
+    /**
+     * Assigns the number of columns to use in form layout
+     * @param numberOfColumns If > 0, Layout will be forced to use this
+     *                        number of columns
+     * @return
+     */
+    public void setNumberOfColumns(int numberOfColumns) {
+        this.numberOfColumns = numberOfColumns;
     }
 }

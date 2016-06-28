@@ -55,7 +55,6 @@ public class FFGBuilder {
     /** If true, form is generated with labels instead of editor nodes */
     private boolean readOnlyMode = false;
 
-
     public FFGBuilder(Object model) {
         this.model = model;
     }
@@ -188,6 +187,17 @@ public class FFGBuilder {
 
     public FFGBuilder assignFormLayout(int formLayout) {
         assembler.assignFormLayout(formLayout);
+        return this;
+    }
+
+    /**
+     * Assigns the number of columns to use in form layout
+     * @param numberOfColumns If > 0, Layout will be forced to use this
+     *                        number of columns
+     * @return
+     */
+    public FFGBuilder setNumberOfColumns(int numberOfColumns) {
+        assembler.setNumberOfColumns(numberOfColumns);
         return this;
     }
 
