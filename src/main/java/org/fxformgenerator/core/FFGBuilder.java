@@ -227,6 +227,21 @@ public class FFGBuilder {
     }
 
     /**
+     * If validation is enabled, check model for validation errors
+     * and constructs form showing them.
+     *
+     * @return
+     */
+    public VBox buildWithValidationMessages() {
+        if (useValidation) {
+            validateModel();
+            retrieveConstraintViolationMessages();
+        }
+
+        return build();
+    }
+
+    /**
      * Iterates over each property inside model object and check that:     <br/>
      * - Property is not included in excluded fields                       <br/>
      * - Property's accessors and setters methods are available.           <br/>
