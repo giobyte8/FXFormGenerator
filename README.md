@@ -25,7 +25,7 @@ FXFormGenerator
     });
 ```
 
-![Screenshot](./docs/screenshots/simple.png)
+![Screenshot](docs/screenshots/sample_simple.png)
 
 ## A complex usage case
 Usually you gonna need to customize the labels of fields, the order and the layout. You can
@@ -77,7 +77,7 @@ FXFormGenerator
     });
 ```
 
-![Screenshot](./docs/screenshots/complex.png)
+![Screenshot](docs/screenshots/sample_complex.png)
 
 ## More examples
 I'm working in document all the library, in the meantime, you can checkout
