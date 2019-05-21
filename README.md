@@ -15,14 +15,14 @@ public class User {
 Now use the `FXFormGenerator` to "automagically" generate a form UI:
 ```java
 
-    User user = new User();
-    FXFormGenerator
-        .forModel(user)
-        .showAsDialog(o -> {
+User user = new User();
+FXFormGenerator
+    .forModel(user)
+    .showAsDialog(o -> {
 
-            // Callback is executed after the form has been filled
-            System.out.println("Now user object is updated with form data");
-        });
+        // Callback is executed after the form has been filled
+        System.out.println("Now user object is updated with form data");
+    });
 ```
 
 ![Screenshot](./docs/screenshots/simple.png)
